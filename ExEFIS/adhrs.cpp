@@ -1,5 +1,5 @@
 #include "adhrs.h"
-#include "BNO055.h"
+#include "HRS_9250.h"
 #include "hsc_pressure.h"
 #include <QApplication>
 #include <QFile>
@@ -7,6 +7,8 @@
 #include <QString>
 #include <math.h>
 #include <QDebug>
+#include <QTimer>
+#include <QWidget>
 
 
 
@@ -15,9 +17,38 @@ adhrs::adhrs()
 {
 	char caldata[22];
 	staticpress = new hsc_pressure();
+	staticpress->set_params(15, 0);
 	airspeed = new hsc_pressure(1);
-	airspeed->set_params(5, -5);
-	bno055 = new BNO055(BNO055_ID, BNO055_ADDRESS_A);
+	airspeed->set_params(1, -1);
+	
+	//SSK Experimentally found
+	float gyroBias[3];
+	gyroBias[0] = -33.893131;
+	gyroBias[1] = 0.305344;
+	gyroBias[2] = -78.167938;	
+	
+	float accelBias[3];
+	accelBias[0]  = 0.015;
+	accelBias[1] = 0.030;
+	accelBias[2] = 0.050;
+	
+	float magBias[3];
+	magBias[0] = 36.899040;
+	magBias[1] = 205.580353;
+	magBias[2] = -365.183350;
+	
+	float magScale[3];
+	magScale[0] = 1.016563;
+	magScale[1] = 1.019730;
+	magScale[2] = 0.965585;
+	
+	//float* ppGyroBias, float* ppAccelBias, float* ppMagBias, float* ppMagScale
+	HRS_9250 *hrs = new HRS_9250(gyroBias, accelBias, magBias, magScale);
+	//HRS_9250 *hrs = new HRS_9250;
+	hrs->Init(true, true);
+
+	
+	//bno055 = new BNO055(BNO055_ID, BNO055_ADDRESS_A);
 	//bno055->begin(BNO055::OPERATION_MODE_NDOF);
 	qDebug("BNO055 Mode is MODE_NDOF");
 	bool cal = false;
@@ -32,16 +63,17 @@ adhrs::adhrs()
 			}
 			/* do we calibrate?*/
 			cal = calfile_validate(caldata);
-			if (cal) qDebug() <<"BNO055 found valid caldata" << calfile->fileName();
+			if (cal) qDebug() <<"found valid caldata" << calfile->fileName();
 		}
-	}
-	bno055->begin(cal, BNO055::OPERATION_MODE_NDOF, caldata); //used to be IMUPLUS
+	}	
+
+	//bno055->begin(cal, BNO055::OPERATION_MODE_NDOF, caldata); //used to be IMUPLUS
 	
-	if (!bno055->isFullyCalibrated())
-	{
+//	if (!bno055->isFullyCalibrated())
+//	{
 		//while (1)
 			;
-	}
+//	}
 }
 
 
@@ -57,23 +89,24 @@ void adhrs::readAll(void)
 	int retry = 0;
 	while (error && retry < 3)
 	{		
-		imu::Quaternion q = bno055->getQuat(&error);
-		if (!error)
+		error = 0;
+		//imu::Quaternion q = bno055->getQuat(&error);
+		if (1)//!error)
 		{	
-			imu::Vector<3> v = q.toEuler();
-			this->euHeading = v[0];    //page 35 in BNO055 manual for order here
-			this->euRoll = v[2];
-			this->euPitch = v[1];
+			//imu::Vector<3> v = q.toEuler();
+		//	this->euHeading = v[0];    //page 35 in BNO055 manual for order here
+			//this->euRoll = v[2];
+			//this->euPitch = v[1];
 			staticPressurePSI = staticpress->getPressure();
 			aspPressureMBAR = airspeed->getPressure();
-			imu::Vector<3> a = bno055->getVector(BNO055::adafruit_vector_type_t::VECTOR_ACCELEROMETER);
-			slipRAW = a.y();	
+		//	imu::Vector<3> a = bno055->getVector(BNO055::adafruit_vector_type_t::VECTOR_ACCELEROMETER);
+			//slipRAW = a.y();	
 		}
 		retry++;
 	}
 	if (error)
 	{		
-		qDebug() << "BNO055 Read Error - 3 retrys failed" << QString::number(error, 10) << ","; 
+		qDebug() << "Read Error - 3 retrys failed" << QString::number(error, 10) << ","; 
 	}
 }
 
@@ -91,22 +124,9 @@ int adhrs::getAllSixRaw(float* data)
 	return status;
 }
 
-
-uint adhrs::readBNORegister(uint reg)
-{
-	return(this->bno055->readRegister(reg));
-}
-
-
-int adhrs::writeBNORegister(uint reg, uint value)
-{
-	this->bno055->writeRegister(reg, value);
-	return (1);
-}
-
 int adhrs::getOffsets(char* calData)
 {
-	if (this->bno055->getSensorOffsets(calData))
+	if (true) //get offsets)
 	{
 		
 		return 1;
@@ -117,14 +137,14 @@ int adhrs::getOffsets(char* calData)
 
 int adhrs::setOffsets(char* calData)
 {
-	this->bno055->setSensorOffsets(calData);
+	//set offsets
 	return 1;
 }
 
 
 void adhrs::getCalibration(char* cal)
 {	
-	this->bno055->getCalibration(&cal[0], &cal[1], &cal[2], &cal[3]);
+	//get calibration
 }
 
 
@@ -193,3 +213,4 @@ bool adhrs::calfile_validate(char* data)
 {
 	return (true);
 }
+

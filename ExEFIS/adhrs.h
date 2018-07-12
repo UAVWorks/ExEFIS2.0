@@ -1,7 +1,8 @@
 #pragma once
-#include "BNO055.h"
 #include "hsc_pressure.h"
 #include <QByteArray>
+#include <QTimer>
+#include "HRS_9250.h"
 
 class adhrs
 {
@@ -9,15 +10,14 @@ public:
 	adhrs();
 	~adhrs();
 	void readAll(void);
-	int getAllSixRaw(float* data);
-	uint readBNORegister(uint reg);
-	int writeBNORegister(uint reg, uint value);
+	int getAllSixRaw(float* data);	
 	int getOffsets(char* calData);
 	int setOffsets(char* calData);
 	void getCalibration(char* cal);
 	
+	
 private:
-	BNO055 *bno055;
+	
 	hsc_pressure *staticpress;
 	hsc_pressure *airspeed;
 	float staticPressurePSI;
@@ -28,6 +28,7 @@ private:
 	float slipRAW;
 	void calfile_process_line(QByteArray &line, char* data);
 	bool calfile_validate(char* data);
+	HRS_9250 *hrs;
 	
 };
 

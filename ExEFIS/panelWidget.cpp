@@ -8,6 +8,7 @@
 #include <QWidget>
 #include <QGridLayout>
 #include <QDebug>
+#include <math.h>
 
 int counter = 0;
 int mode = 0;
@@ -96,13 +97,8 @@ void panelWidget::onTimer(void)
 		adhr->getCalibration(cal);
 		sw->status = "Sys: " + QString::number(cal[0]) + " Gyro: " + QString::number(cal[1]) + "\r" + "\n" +
 			"Accel: " + QString::number(cal[2]) + " Mag: " + QString::number(cal[3]) + " Hdg: " + QString::number(adhrdata[2], 'g', 4);// " Pres: " + QString::number(adhrdata[0], 'g', 4);
-	}
+	}	
 	
-	if (knob->left->getSinglePress())
-	{
-		dg->toggleEditMode();
-		knob->left->setValue(dg->setting);
-	}
 	if (knob->right->getSinglePress())
 	{
 		mode++;
@@ -152,7 +148,7 @@ void panelWidget::setKNOBS(knobs* k)
 {
 	/* be sure and read the presses and clear them when you set the variable*/
 	knob = k;
-	knob->left->getPress(true);
+	//knob->left->getPress(true);
 	knob->right->getPress(true);
 }
 

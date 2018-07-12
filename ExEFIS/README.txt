@@ -79,5 +79,7 @@ write8(BNO055_AXIS_MAP_CONFIG_ADDR, 0x18);//REMAP_CONFIG_P2); // P0-P7, Default 
 	                delay(10);
 					write8(BNO055_AXIS_MAP_SIGN_ADDR, 0x04);//REMAP_SIGN_P2); // P0-P7, Default is P1
 	                delay(10);
+**************************************************************************************************************************************
 
-
+07/10/18
+Removed BNO055 and added invensense - new hardware platform 2.0
