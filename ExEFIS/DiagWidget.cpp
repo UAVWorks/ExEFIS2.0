@@ -40,7 +40,7 @@ DiagWidget::DiagWidget(QWidget *parent)
 	//mainLayout->setColumnStretch(1, 1);
 	//mainLayout->setColumnStretch(2, 2);
 	//mainLayout->setColumnStretch(3, 1);
-	mainLayout->addWidget(textEditadhrs, 0, 0, 3, 1, 0);
+	mainLayout->addWidget(textEditknobs, 0, 0, 3, 1, 0);
 //	mainLayout->addWidget(textEditknobs, 0, 1, 3, 1, 0);
 	//mainLayout->addWidget(textEditconfig, 0, 2, 3, 1, 0);
 //	mainLayout->addWidget(sendButton, 0, 3, 1, 1, 0);
@@ -102,8 +102,8 @@ void DiagWidget::pollTimerExp(void)
 		QString::number(adhrdata[5], 'f', 2)
 		);
 	
-	textEditknobs->setText(QString::number( knob->left->getValue() ) + '\r' + '\n' +
-		QString::number(knob->left->getPress(false)) + '\r' + '\n' +
+	textEditknobs->setText(QString::number( knob->right->getValue() ) + '\r' + '\n' +
+		QString::number(knob->right->getPress(false)) + '\r' + '\n' +
 		QString::number(knob->right->getValue() ) + '\r' + '\n' +
 		QString::number(knob->right->getPress(false)));
 	//textEdit2->setText(QString::number(pressure));
@@ -122,7 +122,7 @@ void DiagWidget::readRegisterButtonClicked()
 	uint reg = this->textEditconfig->toPlainText().toUInt(&hexstatus, 16); 
 	if (hexstatus)
 	{
-		uint value = adhr->readBNORegister(reg);
+		uint value = 0; //= adhr->readBNORegister(reg);
 		this->textEditconfig->setText(textEditconfig->toPlainText() + '\r' + '\n' + QString::number(value, 16));
 		
 	}

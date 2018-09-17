@@ -54,9 +54,6 @@
     <ClCompile Include="RotaryEncoder.cpp">
       <Filter>Source files</Filter>
     </ClCompile>
-    <ClCompile Include="BNO055.cpp">
-      <Filter>Source files</Filter>
-    </ClCompile>
     <ClCompile Include="hsc_pressure.cpp">
       <Filter>Source files</Filter>
     </ClCompile>
@@ -84,6 +81,21 @@
     <ClCompile Include="StatusWidget.cpp">
       <Filter>Source files</Filter>
     </ClCompile>
+    <ClCompile Include="MPU9250.cpp">
+      <Filter>Source files</Filter>
+    </ClCompile>
+    <ClCompile Include="WiringPiTransfer.cpp">
+      <Filter>Source files</Filter>
+    </ClCompile>
+    <ClCompile Include="HRS_9250.cpp">
+      <Filter>Source files</Filter>
+    </ClCompile>
+    <ClCompile Include="round_instrument.cpp">
+      <Filter>Source files</Filter>
+    </ClCompile>
+    <ClCompile Include="MenuWidget.cpp">
+      <Filter>Source files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="ExEFIS.pro" />
@@ -102,9 +114,6 @@
       <Filter>Header files</Filter>
     </ClInclude>
     <ClInclude Include="adhrs.h">
-      <Filter>Header files</Filter>
-    </ClInclude>
-    <ClInclude Include="BNO055.h">
       <Filter>Header files</Filter>
     </ClInclude>
     <ClInclude Include="Vector.h">
@@ -147,6 +156,27 @@
       <Filter>Header files</Filter>
     </ClInclude>
     <ClInclude Include="StatusWidget.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="MPU9250.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="WiringPiTransfer.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="ByteTransfer.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="HRS_9250.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="quaternionFilters.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="round_instrument.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="MenuWidget.h">
       <Filter>Header files</Filter>
     </ClInclude>
   </ItemGroup>

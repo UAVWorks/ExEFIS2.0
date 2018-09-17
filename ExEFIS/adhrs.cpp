@@ -9,6 +9,7 @@
 #include <QDebug>
 #include <QTimer>
 #include <QWidget>
+#include "wiringPi.h"
 
 
 
@@ -23,30 +24,33 @@ adhrs::adhrs()
 	
 	//SSK Experimentally found
 	float gyroBias[3];
-	gyroBias[0] = -33.893131;
-	gyroBias[1] = 0.305344;
-	gyroBias[2] = -78.167938;	
+	gyroBias[0] = 49.374046;
+	gyroBias[1] = 0.229008;
+	gyroBias[2] = 78.167938;	
 	
 	float accelBias[3];
-	accelBias[0]  = 0.015;
-	accelBias[1] = 0.030;
-	accelBias[2] = 0.050;
+	accelBias[0]  = 177.612305;
+	accelBias[1] = 14.709473;
+	accelBias[2] = 62.500000;
 	
 	float magBias[3];
-	magBias[0] = 36.899040;
-	magBias[1] = 205.580353;
-	magBias[2] = -365.183350;
+	magBias[0] = 224.639008;
+	magBias[1] = 178.052505;
+	magBias[2] = -220.621109;
 	
 	float magScale[3];
-	magScale[0] = 1.016563;
-	magScale[1] = 1.019730;
-	magScale[2] = 0.965585;
+	magScale[0] = 0.983562;
+	magScale[1] = 1.071642;
+	magScale[2] = 0.952255;
+	
+//	X - Axis sensitivity adjustment value + 1.18
+//Y - Axis sensitivity adjustment value + 1.19
+//Z - Axis sensitivity adjustment value + 1.14
 	
 	//float* ppGyroBias, float* ppAccelBias, float* ppMagBias, float* ppMagScale
 	HRS_9250 *hrs = new HRS_9250(gyroBias, accelBias, magBias, magScale);
 	//HRS_9250 *hrs = new HRS_9250;
-	hrs->Init(true, true);
-
+	int s = hrs->Init(false, false);
 	
 	//bno055 = new BNO055(BNO055_ID, BNO055_ADDRESS_A);
 	//bno055->begin(BNO055::OPERATION_MODE_NDOF);
@@ -91,16 +95,17 @@ void adhrs::readAll(void)
 	{		
 		error = 0;
 		//imu::Quaternion q = bno055->getQuat(&error);
-		if (1)//!error)
+		imu::Vector<3> v = hrs->GetEuler(&error);
+		if (!error)
 		{	
 			//imu::Vector<3> v = q.toEuler();
-		//	this->euHeading = v[0];    //page 35 in BNO055 manual for order here
-			//this->euRoll = v[2];
-			//this->euPitch = v[1];
+			this->euHeading = v.x();    //page 35 in BNO055 manual for order here
+			this->euRoll = -1.0f*(v.z());
+			this->euPitch = v.y();
 			staticPressurePSI = staticpress->getPressure();
 			aspPressureMBAR = airspeed->getPressure();
-		//	imu::Vector<3> a = bno055->getVector(BNO055::adafruit_vector_type_t::VECTOR_ACCELEROMETER);
-			//slipRAW = a.y();	
+			imu::Vector<3> a = hrs->GetAccelerometer(&error);
+			slipRAW = -2.0f*(a.y());	
 		}
 		retry++;
 	}
@@ -108,18 +113,24 @@ void adhrs::readAll(void)
 	{		
 		qDebug() << "Read Error - 3 retrys failed" << QString::number(error, 10) << ","; 
 	}
+	
+	if (std::isnan(this->euHeading))
+	{
+		hrs->resetAlgorithm();
+	}
 }
 
 
 int adhrs::getAllSixRaw(float* data)
-{
+{		
+	
 	int status = 0;
 	data[0] = this->staticPressurePSI;
 	data[1] = this->aspPressureMBAR;
-	data[2] = 360 - (180 + this->euHeading * (180.0f / M_PI)); //quat is in radians
-	data[3] = this->euRoll * (180.0f / M_PI); //quat is in radians
-	data[4] = this->euPitch * (180.0f / M_PI); //quat is in radians
-	data[5] = this->slipRAW;
+	data[2] = 360.0f - (this->euHeading * (180.0f / M_PI) + 180.0f); //quat is in radians
+	data[3] = (this->euRoll * (180.0f / M_PI)); //quat is in radians
+	data[4] = (this->euPitch * (180.0f / M_PI)); //quat is in radians
+	data[5] = (this->slipRAW);
 	
 	return status;
 }

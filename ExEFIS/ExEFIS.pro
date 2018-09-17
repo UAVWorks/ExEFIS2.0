@@ -11,8 +11,8 @@ TEMPLATE = app
 
 #By default the following file lists are updated automatically by VisualGDB.
 
-SOURCES   += adhrs.cpp airspeed.cpp altitude.cpp BNO055.cpp directional_gyro.cpp ExEFIS.cpp horizon_instrument.cpp hsc_pressure.cpp knobs.cpp DiagWidget.cpp panelWidget.cpp reticle.cpp RotaryEncoder.cpp slipskid_instrument.cpp SplashWidget.cpp StatusWidget.cpp vertical_instrument.cpp
-HEADERS   += adhrs.h airspeed.h altitude.h BNO055.h directional_gyro.h horizon_instrument.h hsc_pressure.h knobs.h Matrix.h panelWidget.h Quaternion.h reticle.h RotaryEncoder.h slipskid_instrument.h SplashWidget.h StatusWidget.h Vector.h vertical_instrument.h DiagWidget.h
+SOURCES   += adhrs.cpp airspeed.cpp altitude.cpp directional_gyro.cpp ExEFIS.cpp horizon_instrument.cpp HRS_9250.cpp hsc_pressure.cpp knobs.cpp DiagWidget.cpp MenuWidget.cpp MPU9250.cpp panelWidget.cpp reticle.cpp RotaryEncoder.cpp round_instrument.cpp slipskid_instrument.cpp SplashWidget.cpp StatusWidget.cpp vertical_instrument.cpp WiringPiTransfer.cpp
+HEADERS   += adhrs.h airspeed.h altitude.h ByteTransfer.h directional_gyro.h horizon_instrument.h HRS_9250.h hsc_pressure.h knobs.h Matrix.h MenuWidget.h MPU9250.h panelWidget.h Quaternion.h quaternionFilters.h reticle.h RotaryEncoder.h round_instrument.h slipskid_instrument.h SplashWidget.h StatusWidget.h Vector.h vertical_instrument.h WiringPiTransfer.h DiagWidget.h
 FORMS     += 
 RESOURCES += img.qrc
 

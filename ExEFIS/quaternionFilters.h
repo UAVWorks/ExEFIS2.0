@@ -22,8 +22,8 @@ float GyroMeasDrift = M_PI * (0.0f  / 180.0f);    // gyroscope measurement drift
 // In any case, this is the free parameter in the Madgwick filtering and fusion scheme.
 float beta = sqrt(3.0f / 4.0f) * GyroMeasError;    // compute beta
 float zeta = sqrt(3.0f / 4.0f) * GyroMeasDrift;    // compute zeta, the other free parameter in the Madgwick scheme usually set to a small or zero value
-#define Kp 2.0f * 5.0f // these are the free parameters in the Mahony filter and fusion scheme, Kp for proportional feedback, Ki for integral
-#define Ki 0.5f
+#define Kp 1.0f * 5.0f // these are the free parameters in the Mahony filter and fusion scheme, Kp for proportional feedback, Ki for integral
+#define Ki 0.2f
 
 float deltat = 0.0f;
 

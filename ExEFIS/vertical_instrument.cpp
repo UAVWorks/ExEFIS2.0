@@ -119,12 +119,15 @@ void vertical_instrument::paintEvent(QPaintEvent * /* event */)
 	
 	if (showSetting)
 	{
-		if (!this->blinking)	painter.setPen(Qt::black);
-		else painter.setPen(Qt::blue);
+		pen.setWidth(2);
+		if (!this->blinking)	pen.setColor(Qt::black);
+		else pen.setColor(Qt::blue);
+		painter.setPen(pen);
 		painter.setBrush(QColor::fromRgb(0, 0, 0, 150));
 		painter.drawRect(bottomRect);
 		painter.setPen(Qt::white);
 		painter.drawText(bottomRect, Qt::AlignCenter, QString::number(setting / pow(10, settingPrec), 'f', settingPrec));
+		pen.setWidth(1);
 	}
 }
 
@@ -172,4 +175,10 @@ void vertical_instrument::setEditMode(bool emode)
 void vertical_instrument::toggleEditMode(void)
 {
 	setEditMode(!editMode);
+}
+
+
+int vertical_instrument::getValue(void)
+{
+	return (value);
 }

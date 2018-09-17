@@ -17,6 +17,9 @@ static const uint8_t SAMPLE_RATE_DIVISOR = 0x04;
 // scale resolutions per LSB for the sensors
 static float aRes, gRes, mRes;
 
+static imu::Vector<3> euler;
+static float ax, ay, az, gx, gy, gz, mx, my, mz;
+
 MPU9250Master *dev;
 
 // Pin definitions
@@ -45,6 +48,7 @@ static float gyroBias[3], accelBias[3] = { 0, 0, 0 },
 
 HRS_9250::HRS_9250()
 {
+	ax = ay = az = gx = gy = gz = mx = my = mz = 0;
 	runFilter = false;
 	mpu = new WiringPiI2C(MPU9250::MPU9250_ADDRESS);
 	dev = new MPU9250Master(mpu); 
@@ -60,6 +64,13 @@ HRS_9250::HRS_9250()
 
 HRS_9250::HRS_9250(float* ppGyroBias, float* ppAccelBias, float* ppMagBias, float* ppMagScale):HRS_9250()
 {
+	ax = ay = az = gx = gy = gz = mx = my = mz = 0;
+	
+	runFilter = false;
+	mpu = new WiringPiI2C(MPU9250::MPU9250_ADDRESS);
+	dev = new MPU9250Master(mpu); 
+	wiringPiSetup();	
+	
 	pGyroBias = ppGyroBias; 
 	pAccelBias = ppAccelBias; 
 	pMagBias = ppMagBias; 
@@ -70,13 +81,16 @@ int HRS_9250::Init(bool doSelfTest, bool doCalibration)
 {
 	int status = 0;
 	
+	dev->resetMPU9250();
+	
 	mpu->begin();
 
 	sensorID = dev->getMPU9250ID();
-	printf("MPU9250  I AM %02X  I should be 0x71\n", sensorID);
+	
+	printf("MPU9250  I AM 0x%02X  I should be 0x71\n", sensorID);
 	// WHO_AM_I should always be 0x71 for MPU9250, 0x73 for MPU9255 
-	delay(1000);
-
+	delay(1000);	
+	
 	if (sensorID == 0x71) {
     
 		printf("MPU9250 is online...\n");
@@ -120,11 +134,19 @@ int HRS_9250::Init(bool doSelfTest, bool doCalibration)
 		dev->initMPU9250(ASCALE, GSCALE, SAMPLE_RATE_DIVISOR); 
 		printf("MPU9250 initialized for active data mode....\n"); 
 
+		delay(2000);
+		
 		// Read the WHO_AM_I register of the magnetometer, this is a good test of communication
 		uint8_t d = dev->getAK8963CID();      // Read WHO_AM_I register for AK8963
 		printf("AK8963  I AM 0x%02x  I should be 0x48\n", d);
-		delay(1000); 
-
+		delay(500); 
+		if (d != 0x48)
+		{
+			d = dev->getAK8963CID();       // Read WHO_AM_I register for AK8963
+			printf("AK8963  I AM 0x%02x  I should be 0x48\n", d);
+			delay(500); 			
+		}
+		
 		// Get magnetometer calibration from AK8963 ROM
 		dev->initAK8963(MSCALE, MMODE, magCalibration);
 		printf("AK8963 initialized for active data mode....\n"); 
@@ -161,7 +183,7 @@ int HRS_9250::Init(bool doSelfTest, bool doCalibration)
 		status = -1;
 	}	
 	delay(1000);
-	return 1;
+	return status;
 }
 
 
@@ -208,9 +230,16 @@ int HRS_9250::GetCalibration(HRS_CAL* cal)
 
 imu::Vector<3> HRS_9250::GetEuler(int* status)
 {
-	*status = 1;
+	*status = 0;
 	return q.toEuler();
 }
+
+imu::Vector<3> HRS_9250::GetAccelerometer(int*status)
+{
+	*status = 0;
+	return (imu::Vector<3>((double)ax, (double)ay, (double)az));
+}
+
 
 
 void HRS_9250::imuInterruptHander(void)
@@ -219,10 +248,11 @@ void HRS_9250::imuInterruptHander(void)
 }
 
 
+
 void HRS_9250::RunFilter(void)
 {
 	static int16_t MPU9250Data[7];     // used to read all 14 bytes at once from the MPU9250 accel/gyro
-	static float ax, ay, az, gx, gy, gz, mx, my, mz;
+	static int16_t magCount[3];         // Stores the 16-bit signed magnetometer sensor output
 	
 	if (true)
 	{	
@@ -242,7 +272,7 @@ void HRS_9250::RunFilter(void)
 			gy = (float)MPU9250Data[5]*gRes;  
 			gz = (float)MPU9250Data[6]*gRes; 
 
-			int16_t magCount[3];        // Stores the 16-bit signed magnetometer sensor output
+			
 
 			dev->readMagData(magCount);       // Read the x/y/z adc values
 
@@ -264,25 +294,25 @@ void HRS_9250::RunFilter(void)
 		int current = micros();
 		deltat = (current - last) / 1000000.0f;
 		last = current;
-		//		MadgwickQuaternionUpdate(ax,
-		//			ay,
-		//			az,
-		//			gx*M_PI / 180.0f,
-		//			gy*M_PI / 180.0f,
-		//			gz*M_PI / 180.0f,
-		//			my,
-		//			mx,
-		//			-mz);
+				MadgwickQuaternionUpdate(az,
+					ay,
+					ax,
+					gz*M_PI / 180.0f,
+					gy*M_PI / 180.0f,
+					gx*M_PI / 180.0f,
+					-mz,
+					my,
+					mx);
 
 		
-				MahonyQuaternionUpdate(ax, ay, az, gx*M_PI / 180.0f, gy*M_PI / 180.0f, gz*M_PI / 180.0f, my, mx, -mz);
+//				MahonyQuaternionUpdate(ax, ay, az, gx*M_PI / 180.0f, gy*M_PI / 180.0f, gz*M_PI / 180.0f, mx, my, -mz);
 		
 		/* only print once per second*/
 		if (msec_curr - msec_prev > 250) {
 
 			msec_prev = msec_curr;
 			
-			imu::Vector<3> euler = q.toEuler();
+			euler = q.toEuler();
 			
 			//printf("TIME DELTA:::::: = %f \n", deltat); 
 			
@@ -292,20 +322,33 @@ void HRS_9250::RunFilter(void)
 			//printf("%d, %d, %d \n", (int)mx, (int)my, (int)mz);
 			//printf("ORIENTATION:::  hdg = %f  pit = %f  roll = %f \n", euler.x() * 180.0f / M_PI, euler.y() * 180.0f / M_PI, euler.z() * 180.0f / M_PI);
 			//printf("%f, %f, %f \n", euler.x() * 180.0f / M_PI, euler.y() * 180.0f / M_PI, euler.z() * 180.0f / M_PI);
-			printf("Orientation:, %f, %f, %f, Accelerometer:, %d, %d, %d, Gyro: , %+2.2f, %+2.2f, %+2.2f, Mag:, %d, %d, %d,  \n", 
-				euler.x() * 180.0f / M_PI,
-				euler.y() * 180.0f / M_PI,
-				euler.z() * 180.0f / M_PI, 
-				(int)(1000*ax),
-				(int)(1000*ay),
-				(int)(1000*az),
-				gx,
-				gy,
-				gz,
-				(int)mx,
-				(int)my,
-				(int)mz);
-			float temperature = ((float) MPU9250Data[3]) / 333.87f + 21.0f;     // Gyro chip temperature in degrees Centigrade
+//			printf("Orientation:, %f, %f, %f, Accelerometer:, %d, %d, %d, Gyro: , %+2.2f, %+2.2f, %+2.2f, Mag:, %d, %d, %d,  \n", 
+//				euler.x() * 180.0f / M_PI,
+//				euler.y() * 180.0f / M_PI,
+//				euler.z() * 180.0f / M_PI, 
+//				(int)(1000*ax),
+//				(int)(1000*ay),
+//				(int)(1000*az),
+//				gx,
+//				gy,
+//				gz,
+//				(int)mx,
+//				(int)my,
+//				(int)mz);
+//			printf("Orientation:, %f, %f, %f, Accelerometer:, %d, %d, %d, Gyro: , %d, %d, %d, Mag:, %d, %d, %d,  \n", 
+//				euler.x() * 180.0f / M_PI,
+//				euler.y() * 180.0f / M_PI,
+//				euler.z() * 180.0f / M_PI, 
+//				MPU9250Data[0],
+//				MPU9250Data[1],
+//				MPU9250Data[2],
+//				MPU9250Data[4],
+//				MPU9250Data[5],
+//				MPU9250Data[6],
+//				magCount[0],
+//				magCount[1],
+//				magCount[2]);
+//			float temperature = ((float) MPU9250Data[3]) / 333.87f + 21.0f;     // Gyro chip temperature in degrees Centigrade
 
 			// Print temperature in degrees Centigrade      
 			//printf("Gyro temperature is %+1.1f degrees C\n", temperature);  
@@ -316,3 +359,11 @@ void HRS_9250::RunFilter(void)
 //This is a test
 
 
+
+
+
+
+void HRS_9250::resetAlgorithm(void)
+{
+	ax = ay = az = gx = gy = gz = mx = my = mz = 0;
+}

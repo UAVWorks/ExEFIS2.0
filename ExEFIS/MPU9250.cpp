@@ -205,8 +205,8 @@ int16_t MPU9250::readGyroTempData()
 void MPU9250::initMPU9250(Ascale_t ascale, Gscale_t gscale, uint8_t sampleRateDivisor, bool passthru)
 {  
     // wake up device
-    //_mpu->writeRegister(PWR_MGMT_1, 0x00); // Clear sleep mode bit (6), enable all sensors 
-    _mpu->writeRegister(PWR_MGMT_1, 0x80); // Clear sleep mode bit (6), enable all sensors 
+    _mpu->writeRegister(PWR_MGMT_1, 0x00); // Clear sleep mode bit (6), enable all sensors 
+    //_mpu->writeRegister(PWR_MGMT_1, 0x80); // Clear sleep mode bit (6), enable all sensors 
     delay(100); // Wait for all registers to reset 
 
     // get stable time source
@@ -370,31 +370,40 @@ void MPU9250::calibrateMPU9250(float * dest1, float * dest2)
     _mpu->readRegisters(FIFO_COUNTH, 2, &data[0]); // read FIFO sample count
     fifo_count = ((uint16_t)data[0] << 8) | data[1];
     packet_count = fifo_count/12;// How many sets of full gyro and accelerometer data for averaging
+	if (packet_count)
+	{
+		
+	
+		for (ii = 0; ii < packet_count; ii++)
+		{
+			int16_t accel_temp[3] = { 0, 0, 0 }, gyro_temp[3] = { 0, 0, 0 };
+			_mpu->readRegisters(FIFO_R_W, 12, &data[0]);    // read data for averaging
+			accel_temp[0] = (int16_t)(((int16_t)data[0] << 8) | data[1]);     // Form signed 16-bit integer for each sample in FIFO
+			accel_temp[1] = (int16_t)(((int16_t)data[2] << 8) | data[3]);
+			accel_temp[2] = (int16_t)(((int16_t)data[4] << 8) | data[5]);    
+			gyro_temp[0]  = (int16_t)(((int16_t)data[6] << 8) | data[7]);
+			gyro_temp[1]  = (int16_t)(((int16_t)data[8] << 8) | data[9]);
+			gyro_temp[2]  = (int16_t)(((int16_t)data[10] << 8) | data[11]);
 
-    for (ii = 0; ii < packet_count; ii++) {
-        int16_t accel_temp[3] = {0, 0, 0}, gyro_temp[3] = {0, 0, 0};
-        _mpu->readRegisters(FIFO_R_W, 12, &data[0]); // read data for averaging
-        accel_temp[0] = (int16_t) (((int16_t)data[0] << 8) | data[1]  ) ;  // Form signed 16-bit integer for each sample in FIFO
-        accel_temp[1] = (int16_t) (((int16_t)data[2] << 8) | data[3]  ) ;
-        accel_temp[2] = (int16_t) (((int16_t)data[4] << 8) | data[5]  ) ;    
-        gyro_temp[0]  = (int16_t) (((int16_t)data[6] << 8) | data[7]  ) ;
-        gyro_temp[1]  = (int16_t) (((int16_t)data[8] << 8) | data[9]  ) ;
-        gyro_temp[2]  = (int16_t) (((int16_t)data[10] << 8) | data[11]) ;
+			accel_bias[0] += (int32_t) accel_temp[0];    // Sum individual signed 16-bit biases to get accumulated signed 32-bit biases
+			accel_bias[1] += (int32_t) accel_temp[1];
+			accel_bias[2] += (int32_t) accel_temp[2];
+			gyro_bias[0]  += (int32_t) gyro_temp[0];
+			gyro_bias[1]  += (int32_t) gyro_temp[1];
+			gyro_bias[2]  += (int32_t) gyro_temp[2];
 
-        accel_bias[0] += (int32_t) accel_temp[0]; // Sum individual signed 16-bit biases to get accumulated signed 32-bit biases
-        accel_bias[1] += (int32_t) accel_temp[1];
-        accel_bias[2] += (int32_t) accel_temp[2];
-        gyro_bias[0]  += (int32_t) gyro_temp[0];
-        gyro_bias[1]  += (int32_t) gyro_temp[1];
-        gyro_bias[2]  += (int32_t) gyro_temp[2];
-
-    }
-    accel_bias[0] /= (int32_t) packet_count; // Normalize sums to get average count biases
-    accel_bias[1] /= (int32_t) packet_count;
-    accel_bias[2] /= (int32_t) packet_count;
-    gyro_bias[0]  /= (int32_t) packet_count;
-    gyro_bias[1]  /= (int32_t) packet_count;
-    gyro_bias[2]  /= (int32_t) packet_count;
+		}
+		accel_bias[0] /= (int32_t) packet_count;    // Normalize sums to get average count biases
+		accel_bias[1] /= (int32_t) packet_count;
+		accel_bias[2] /= (int32_t) packet_count;
+		gyro_bias[0]  /= (int32_t) packet_count;
+		gyro_bias[1]  /= (int32_t) packet_count;
+		gyro_bias[2]  /= (int32_t) packet_count;
+	}
+	else
+	{
+		
+	}
 
 	//SSK commented out these lines
     if(accel_bias[2] > 0L) {accel_bias[2] -= (int32_t) accelsensitivity;}  // Remove gravity from the z-axis accelerometer bias calculation

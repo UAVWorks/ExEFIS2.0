@@ -40,9 +40,11 @@ public:
 	int SetCalibration(HRS_CAL* cal);
 	int GetCalibration(HRS_CAL* cal);
 	imu::Vector<3> GetEuler(int* status);
+	imu::Vector<3> GetAccelerometer(int*status);
+	void resetAlgorithm (void);
 	
 	static void RunFilter(void);
-	
+		
 private:
 	WiringPiI2C *mpu;
 	

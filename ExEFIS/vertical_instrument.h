@@ -12,6 +12,7 @@ public :
 	vertical_instrument(QWidget *parent = 0);
 	vertical_instrument(QWidget *parent, QColor c);
 	void setValue(int val);
+	int getValue(void);
 	void setupInstrument(int* vals, int numVals);
 	void setSetting(float stg);
 	void setEditMode(bool emode);

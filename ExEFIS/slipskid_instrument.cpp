@@ -55,7 +55,7 @@ void slipskid_instrument::paintEvent(QPaintEvent *event)
 	
 	QPainter painter(this);
 	painter.setPen(penColor);
-	painter.setBrush(Qt::white);
+	painter.setBrush(Qt::black);
 	
 	painter.translate(-value*wide, 0);
 	painter.drawEllipse(r);
