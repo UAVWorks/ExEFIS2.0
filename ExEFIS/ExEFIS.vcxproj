@@ -45,7 +45,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <NMakeIncludeSearchPath>$(TOOLCHAIN_ROOT)\arm-linux-gnueabihf\sysroot\usr\lib\arm-linux-gnueabihf\qt5\mkspecs\arm-linux-gnueabihf;$(TOOLCHAIN_ROOT)\arm-linux-gnueabihf\sysroot\usr\include\arm-linux-gnueabihf\qt5;$(TOOLCHAIN_ROOT)\arm-linux-gnueabihf\sysroot\usr\include\arm-linux-gnueabihf\qt5\QtWidgets;$(TOOLCHAIN_ROOT)\arm-linux-gnueabihf\sysroot\usr\include\arm-linux-gnueabihf\qt5\QtGui;$(TOOLCHAIN_ROOT)\arm-linux-gnueabihf\sysroot\usr\include\arm-linux-gnueabihf\qt5\QtCore;$(TOOLCHAIN_ROOT)\arm-linux-gnueabihf\include\c++\6;$(TOOLCHAIN_ROOT)\arm-linux-gnueabihf\include\c++\6\backward;$(TOOLCHAIN_ROOT)\lib\gcc\arm-linux-gnueabihf\6\include;$(TOOLCHAIN_ROOT)\lib\gcc\arm-linux-gnueabihf\6\include-fixed;$(TOOLCHAIN_ROOT)\arm-linux-gnueabihf\include;$(TOOLCHAIN_ROOT)\arm-linux-gnueabihf\include\arm-linux-gnueabihf\c++\6;$(TOOLCHAIN_ROOT)\arm-linux-gnueabihf\sysroot\usr\include\arm-linux-gnueabihf;$(TOOLCHAIN_ROOT)\arm-linux-gnueabihf\sysroot\usr\include;Debug;$(TOOLCHAIN_ROOT)\arm-linux-gnueabihf\include\c++\6\java\util;$(TOOLCHAIN_ROOT)\arm-linux-gnueabihf\sysroot\usr\include\weston;$(NMakeIncludeSearchPath)</NMakeIncludeSearchPath>
+    <NMakeIncludeSearchPath>$(TOOLCHAIN_ROOT)\arm-linux-gnueabihf\sysroot\usr\lib\arm-linux-gnueabihf\qt5\mkspecs\arm-linux-gnueabihf;$(TOOLCHAIN_ROOT)\arm-linux-gnueabihf\sysroot\usr\include\arm-linux-gnueabihf\qt5;$(TOOLCHAIN_ROOT)\arm-linux-gnueabihf\sysroot\usr\include\arm-linux-gnueabihf\qt5\QtWidgets;$(TOOLCHAIN_ROOT)\arm-linux-gnueabihf\sysroot\usr\include\arm-linux-gnueabihf\qt5\QtGui;$(TOOLCHAIN_ROOT)\arm-linux-gnueabihf\sysroot\usr\include\arm-linux-gnueabihf\qt5\QtCore;$(TOOLCHAIN_ROOT)\arm-linux-gnueabihf\include\c++\6;$(TOOLCHAIN_ROOT)\arm-linux-gnueabihf\include\c++\6\backward;$(TOOLCHAIN_ROOT)\lib\gcc\arm-linux-gnueabihf\6\include;$(TOOLCHAIN_ROOT)\lib\gcc\arm-linux-gnueabihf\6\include-fixed;$(TOOLCHAIN_ROOT)\arm-linux-gnueabihf\include;$(TOOLCHAIN_ROOT)\arm-linux-gnueabihf\include\arm-linux-gnueabihf\c++\6;$(TOOLCHAIN_ROOT)\arm-linux-gnueabihf\sysroot\usr\include\arm-linux-gnueabihf;$(TOOLCHAIN_ROOT)\arm-linux-gnueabihf\sysroot\usr\include;Debug;$(TOOLCHAIN_ROOT)\arm-linux-gnueabihf\include\c++\6\java\util;$(TOOLCHAIN_ROOT)\arm-linux-gnueabihf\sysroot\usr\include\weston;$(ProjectDir);$(NMakeIncludeSearchPath)</NMakeIncludeSearchPath>
     <NMakeForcedIncludes>$(ProjectDir)\gcc_Debug.h;$(VISUALGDB_DIR)\gcc_compat.h;$(NMakeForcedIncludes)</NMakeForcedIncludes>
     <NMakeBuildCommandLine>"$(VISUALGDB_DIR)\VisualGDB.exe" /build "$(ProjectPath)" "/solution:$(SolutionPath)"  "/config:$(Configuration)" "/platform:$(Platform)"</NMakeBuildCommandLine>
     <NMakeCleanCommandLine>"$(VISUALGDB_DIR)\VisualGDB.exe" /clean "$(ProjectPath)" "/solution:$(SolutionPath)"  "/config:$(Configuration)" "/platform:$(Platform)"</NMakeCleanCommandLine>
@@ -90,6 +90,7 @@
     <ClCompile Include="reticle.cpp" />
     <ClCompile Include="RotaryEncoder.cpp" />
     <ClCompile Include="round_instrument.cpp" />
+    <ClCompile Include="SKFilter.cpp" />
     <ClCompile Include="slipskid_instrument.cpp" />
     <ClCompile Include="SplashWidget.cpp" />
     <ClCompile Include="StatusWidget.cpp" />
@@ -113,6 +114,7 @@
     <ClInclude Include="reticle.h" />
     <ClInclude Include="RotaryEncoder.h" />
     <ClInclude Include="round_instrument.h" />
+    <ClInclude Include="SKFilter.h" />
     <ClInclude Include="slipskid_instrument.h" />
     <ClInclude Include="SplashWidget.h" />
     <ClInclude Include="StatusWidget.h" />

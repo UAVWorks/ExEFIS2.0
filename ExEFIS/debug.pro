@@ -7,7 +7,7 @@ CONFIG += debug
 
 DEFINES += 
 LIBS += 
-INCLUDEPATH += 
+INCLUDEPATH += .
 QMAKE_LFLAGS += 
 QMAKE_CXXFLAGS += -std=gnu++14 -ggdb 
 QMAKE_CFLAGS += -std=gnu++14 -ggdb 

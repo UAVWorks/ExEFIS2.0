@@ -173,11 +173,11 @@ void panelWidget::onTimer(void)
 		if (mode == 6)
 		{
 			mw->show = false;			
-			if (mw->value == 2) 
+			if (mw->value == 0) 
 			{
 				system("gpio write 26 1");
 			}
-			if (mw->value == 0)
+			if (mw->value == 2)
 			{
 				system("gpio write 26 0");
 				system("i2cset -y 1 0x2f 0x00 0x0000 w");
@@ -186,7 +186,11 @@ void panelWidget::onTimer(void)
 			{
 				system("gpio write 26 0");
 				system("i2cset -y 1 0x2f 0x00 0xFFFF w");
-			}			
+			}	
+			if (mw->value == 6)
+			{
+				exit(0);
+			}
 		}
 		if (mode >= 6)
 		{			

@@ -14,7 +14,7 @@
 
 
 void WiringPiI2C::begin(void)
-{
+{	
     _fd = wiringPiI2CSetup (_address);
 }
 

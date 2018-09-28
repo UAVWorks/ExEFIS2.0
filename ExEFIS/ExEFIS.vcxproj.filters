@@ -96,6 +96,9 @@
     <ClCompile Include="MenuWidget.cpp">
       <Filter>Source files</Filter>
     </ClCompile>
+    <ClCompile Include="SKFilter.cpp">
+      <Filter>Source files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="ExEFIS.pro" />
@@ -177,6 +180,9 @@
       <Filter>Header files</Filter>
     </ClInclude>
     <ClInclude Include="MenuWidget.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="SKFilter.h">
       <Filter>Header files</Filter>
     </ClInclude>
   </ItemGroup>

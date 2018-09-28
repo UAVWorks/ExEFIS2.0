@@ -7,7 +7,7 @@ CONFIG += debug
 
 DEFINES += 
 LIBS += 
-INCLUDEPATH += ../../../../../../SysGCC/raspberry/arm-linux-gnueabihf/include/c++/6/java/util ../../../../../../SysGCC/raspberry/arm-linux-gnueabihf/sysroot/usr/include/weston
+INCLUDEPATH += .
 QMAKE_LFLAGS += 
 QMAKE_CXXFLAGS += -std=gnu++14 -ggdb 
 QMAKE_CFLAGS += -std=gnu++14 -ggdb 

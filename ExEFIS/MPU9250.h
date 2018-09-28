@@ -59,6 +59,7 @@ class MPU9250 {
         float   getGres(Gscale_t gscale);
         float   getMres(Mscale_t mscale);
         void    magcalMPU9250(float * dest1, float * dest2);
+	void	SendCalibrationData(int *gyro_bias, int *accel_bias);
         void    calibrateMPU9250(float * dest1, float * dest2);
         void    readMPU9250Data(int16_t * destination);
         void    readAccelData(int16_t * destination);

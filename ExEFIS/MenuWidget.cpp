@@ -7,12 +7,12 @@
 MenuWidget::MenuWidget(QWidget *parent)
 {
 	status = "";
-	numItems = 6;
-	items[0].str = "Brightness DIM";
+	numItems = 7;
+	items[0].str = "Brightness BRIGHT";
 	items[0].alwaysShow = false;
 	items[1].str = "Brightness MED";
 	items[1].alwaysShow = false;
-	items[2].str = "Brightness BRIGHT";
+	items[2].str = "Brightness DIM";
 	items[2].alwaysShow = false;
 	items[3].str = "Item 3";
 	items[3].alwaysShow = false;
@@ -20,6 +20,8 @@ MenuWidget::MenuWidget(QWidget *parent)
 	items[4].alwaysShow = true;
 	items[5].str = "Item 5";
 	items[5].alwaysShow = true;
+	items[7].str = "Exit App";
+	items[7].alwaysShow = false;
 }
 
 
