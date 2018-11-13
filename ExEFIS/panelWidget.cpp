@@ -155,12 +155,12 @@ void panelWidget::onTimer(void)
 		}
 		if (mode == 3)
 		{
-			//r1->toggleEditMode();
-			//knob->right->setValue(r1->setting);
+			dg->toggleEditMode();
+			knob->right->setValue(dg->setting);
 		}
 		if (mode == 4)
 		{
-			//r1->toggleEditMode();
+			dg->toggleEditMode();
 		}
 		//Show the menu
 		if (mode == 5)
@@ -209,6 +209,12 @@ void panelWidget::onTimer(void)
 	{
 		mw->setValue(knob->right->getValue());
 		knob->right->setValue(mw->value);
+	}
+	
+	if (dg->editMode)
+	{
+		dg->setSetting(knob->right->getValue());   //NOTE FIXED FOR 3.5 Display
+		knob->right->setValue(dg->setting);
 	}
 	
 	

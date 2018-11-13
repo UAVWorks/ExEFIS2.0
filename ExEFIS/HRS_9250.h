@@ -30,6 +30,7 @@ public:
 	
 	static void imuInterruptHander(void);
 	
+	
 	HRS_9250();
 	HRS_9250(float* ppGyroBias, float* ppAccelBias, float* ppMagBias, float* ppMagScale);
 	~HRS_9250();

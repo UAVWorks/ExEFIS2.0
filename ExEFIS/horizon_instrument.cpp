@@ -40,7 +40,7 @@ void horizon_instrument::paintEvent(QPaintEvent *event)
 	QColor topcolor = QColor::fromRgb(125, 206, 250, 255);  //Sky Blue		
 		
 	QRect bot = QRect(-1.5*width() / 2, 0, 1.5*width(), 2*height() / 2);
-	QColor botcolor = QColor::fromRgb(109, 93, 73, 255);  	//Earth Browm
+	QColor botcolor = QColor::fromRgb(114, 59, 34, 255);  	//Earth Browm
 	
 	QPoint center = QPoint(width() / 2, height() / 2);
 	

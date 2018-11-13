@@ -16,62 +16,64 @@
 
 adhrs::adhrs()
 {
-	char caldata[22];
+	
 	staticpress = new hsc_pressure();
 	staticpress->set_params(15, 0);
 	airspeed = new hsc_pressure(1);
 	airspeed->set_params(1, -1);
 
-//	float gyroBias[3];
-//	gyroBias[0] = 49.374046;
-//	gyroBias[1] = 0.229008;
-//	gyroBias[2] = 78.167938;	
+	/* Current Kitfox Values 10/12/18 */
+	static float gyroBias[3];
+	gyroBias[0] = 0.70;
+	gyroBias[1] = 0.68;
+	gyroBias[2] = 0.60;	
+	
+	static float accelBias[3];
+	accelBias[0]  = -0.021;
+	accelBias[1] = 0.026;
+	accelBias[2] = -0.24;
+	
+	static float magBias[3];
+	magBias[0] = 79.596497;
+	magBias[1] = 213.663010;
+	magBias[2] = -576.351318;
+	
+	static float magScale[3];
+	magScale[0] = 0.984127;
+	magScale[1] = 0.988048;
+	magScale[2] = 1.029046;
+	
+/* ****END Current Kitfox values 10/12/18**** */
+	
+	
+/* Current Test Unit Values     */
+//	static float gyroBias[3];
+//	gyroBias[0] = -1.8;
+//	gyroBias[1] = 0.25;
+//	gyroBias[2] = .55;
 //	
-//	float accelBias[3];
-//	accelBias[0]  = 177.612305;
-//	accelBias[1] = 14.709473;
-//	accelBias[2] = 62.500000;
+//	static float accelBias[3];
+//	accelBias[0]  = -0.019;
+//	accelBias[1] = 0.023;
+//	accelBias[2] = 0.050;
 //	
-//	float magBias[3];
-//	magBias[0] = 224.639008;
-//	magBias[1] = 178.052505;
-//	magBias[2] = -220.621109;
+//	static float magBias[3];
+//	magBias[0] = -68.9835;
+//	magBias[1] = 236.0305;
+//	magBias[2] = -290.741;
 //	
-//	float magScale[3];
-//	magScale[0] = 0.983562;
-//	magScale[1] = 1.071642;
-//	magScale[2] = 0.952255;
+//	static float magScale[3];
+//	magScale[0] = 0.981525;
+//	magScale[1] = 1.053538;
+//	magScale[2] = 0.968996;
 	
-	//current kitfox values
-	
-		float gyroBias[3];
-	gyroBias[0] = -39.053436;
-	gyroBias[1] = 0.251908;
-	gyroBias[2] = 148.519089;
-	
-	float accelBias[3];
-	accelBias[0]  = 480.000;
-	accelBias[1] = 14.282227;
-	accelBias[2] = 218.750000;
-	
-	float magBias[3];
-	magBias[0] = -70.752441;
-	magBias[1] = 252.002869;
-	magBias[2] = 252.002869;
-	
-	float magScale[3];
-	magScale[0] = 1.018518;
-	magScale[1] = 0.989418;
-	magScale[2] = 0.992569;
+/* ****END Current Test Unit values 10/12/18**** */
 	
 //	X - Axis sensitivity adjustment value + 1.18
 //Y - Axis sensitivity adjustment value + 1.19
 //Z - Axis sensitivity adjustment value + 1.14
 	
-	//float* ppGyroBias, float* ppAccelBias, float* ppMagBias, float* ppMagScale
-	HRS_9250 *hrs = new HRS_9250(gyroBias, accelBias, magBias, magScale);
-	//HRS_9250 *hrs = new HRS_9250;
-	int s = hrs->Init(false, false, false);
+	
 	
 	//bno055 = new BNO055(BNO055_ID, BNO055_ADDRESS_A);
 	//bno055->begin(BNO055::OPERATION_MODE_NDOF);
@@ -88,9 +90,37 @@ adhrs::adhrs()
 			}
 			/* do we calibrate?*/
 			cal = calfile_validate(caldata);
-			if (cal) qDebug() <<"found valid caldata" << calfile->fileName();
+			if (cal) 
+			{
+				qDebug() << "found valid caldata" << calfile->fileName();
+				//float* ppGyroBias, float* ppAccelBias, float* ppMagBias, float* ppMagScale
+				HRS_9250 *hrs = new HRS_9250(&caldata[0], &caldata[3], &caldata[6], &caldata[9]);				
+				//HRS_9250 *hrs = new HRS_9250;
+				int s = hrs->Init(true, false, false);
+			}
+			else
+			{
+				//float* ppGyroBias, float* ppAccelBias, float* ppMagBias, float* ppMagScale
+				HRS_9250 *hrs = new HRS_9250(gyroBias, accelBias, magBias, magScale);
+				//HRS_9250 *hrs = new HRS_9250;
+				int s = hrs->Init(true, false, false);
+			}
 		}
-	}	
+		else
+		{
+			//float* ppGyroBias, float* ppAccelBias, float* ppMagBias, float* ppMagScale
+			HRS_9250 *hrs = new HRS_9250(gyroBias, accelBias, magBias, magScale);
+			//HRS_9250 *hrs = new HRS_9250;
+			int s = hrs->Init(true, false, false);
+		}
+	}
+	else
+	{
+		//float* ppGyroBias, float* ppAccelBias, float* ppMagBias, float* ppMagScale
+		HRS_9250 *hrs = new HRS_9250(gyroBias, accelBias, magBias, magScale);
+		//HRS_9250 *hrs = new HRS_9250;
+		int s = hrs->Init(true, false, false);
+	}
 
 	//bno055->begin(cal, BNO055::OPERATION_MODE_NDOF, caldata); //used to be IMUPLUS
 	
@@ -127,7 +157,7 @@ void adhrs::readAll(void)
 			staticPressurePSI = staticpress->getPressure();
 			aspPressureMBAR = airspeed->getPressure();
 			imu::Vector<3> a = hrs->GetAccelerometer(&error);
-			slipRAW = -2.0f*(a.y());	
+			slipRAW = -8.0f*(a.y());	
 		}
 		retry++;
 	}
@@ -181,68 +211,73 @@ void adhrs::getCalibration(char* cal)
 }
 
 
-void adhrs::calfile_process_line(QByteArray &line, char* data)
+void adhrs::calfile_process_line(QByteArray &line, float* data)
 {
-	short* dat = (short*)data;
-	if (line.startsWith("Accel Offset X"))
-	{		
-		short val = line.split('"')[1].toShort();
-		dat[0] = val;
-	}
-	if (line.startsWith("Accel Offset Y"))
-	{		
-		short val = line.split('"')[1].toShort();
-		dat[1] = val;
-	}
-	if (line.startsWith("Accel Offset Z"))
-	{		
-		short val = line.split('"')[1].toShort();
-		dat[2] = val;
-	}
 	if (line.startsWith("Gyro Offset X"))
 	{		
-		short val = line.split('"')[1].toShort();
-		dat[3] = val;
+		float val = line.split('"')[1].toFloat();
+		data[0] = val;
 	}
 	if (line.startsWith("Gyro Offset Y"))
 	{		
-		short val = line.split('"')[1].toShort();
-		dat[4] = val;
+		float val = line.split('"')[1].toFloat();
+		data[1] = val;
 	}
 	if (line.startsWith("Gyro Offset Z"))
 	{		
-		short val = line.split('"')[1].toShort();
-		dat[5] = val;
+		float val = line.split('"')[1].toFloat();
+		data[2] = val;
 	}
+	if (line.startsWith("Accel Offset X"))
+	{		
+		float val = line.split('"')[1].toFloat();
+		data[3] = val;
+	}
+	if (line.startsWith("Accel Offset Y"))
+	{		
+		float val = line.split('"')[1].toFloat();
+		data[4] = val;
+	}
+	if (line.startsWith("Accel Offset Z"))
+	{		
+		float val = line.split('"')[1].toFloat();
+		data[5] = val;
+	}
+	
 	if (line.startsWith("Mag Offset X"))
 	{		
-		short val = line.split('"')[1].toShort();
-		dat[6] = val;
+		float val = line.split('"')[1].toFloat();
+		data[6] = val;
 	}
 	if (line.startsWith("Mag Offset Y"))
 	{		
-		short val = line.split('"')[1].toShort();
-		dat[7] = val;
+		float val = line.split('"')[1].toFloat();
+		data[7] = val;
 	}
 	if (line.startsWith("Mag Offset Z"))
 	{		
-		short val = line.split('"')[1].toShort();
-		dat[8] = val;
+		float val = line.split('"')[1].toFloat();
+		data[8] = val;
 	}
-	if (line.startsWith("Accel Radius"))
+	if (line.startsWith("Mag Scale X"))
 	{		
-		short val = line.split('"')[1].toShort();
-		dat[9] = val;
+		float val = line.split('"')[1].toFloat();
+		data[9] = val;
 	}
-	if (line.startsWith("Mag Radius"))
+	if (line.startsWith("Mag Scale Y"))
 	{		
-		short val = line.split('"')[1].toShort();
-		dat[9] = val;
+		float val = line.split('"')[1].toFloat();
+		data[10] = val;
+	}
+	if (line.startsWith("Mag Scale Z"))
+	{		
+		float val = line.split('"')[1].toFloat();
+		data[11] = val;	
 	}
 }
 
 
-bool adhrs::calfile_validate(char* data)
+bool adhrs::calfile_validate(float* data)
 {
 	return (true);
 }

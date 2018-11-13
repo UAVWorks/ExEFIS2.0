@@ -8,6 +8,7 @@ public:
 	SKFilter();
 	~SKFilter();
 	void setInitializationDuration(int duration);
+	bool validate(float gx, float gy, float gz, float ax, float ay, float az, float hx, float hy, float hz);
 	bool update(float gx, float gy, float gz, float ax, float ay, float az, float hx, float hy, float hz);
 	float getRoll_rad();
 	float getPitch_rad();
@@ -17,8 +18,10 @@ public:
 	imu::Vector<3> getEuler(void);
 private:
 	bool _initialized = false;
+	int _initCounter = 0;
 	// timing
 	float _tnow, _tprev, _dt;
+	float valid;
 	
 	float magHeading;
 	
@@ -37,7 +40,10 @@ private:
 	float constrainAngle360(float dta);
 	
 	imu::Vector<3> _Euler;
+	imu::Vector<3> _Euler_Fixed;
 	imu::Vector<3> gyroPrev;
 	imu::Vector<3> _InitialEuler;
+	
+	
 };
 

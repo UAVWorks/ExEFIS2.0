@@ -1,34 +1,22 @@
 ﻿  VisualGDB: Run "C:\SysGCC\raspberry\Qt\v5\qmake.exe  ExEFIS.pro CONFIGNAME=Debug" in directory "C:\Users\skreikemeier\source\repos\ExEFIS2.0\ExEFIS" on local machine
   VisualGDB: Run "C:\SysGCC\raspberry\bin\make.exe " in directory "C:\Users\skreikemeier\source\repos\ExEFIS2.0\ExEFIS" on local machine
-  C:/SysGCC/raspberry/bin/arm-linux-gnueabihf-g++.exe -c -pipe -Wno-psabi -std=gnu++14 -ggdb -g -Wall -W -D_REENTRANT -fPIC -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB -IC:/SysGCC/raspberry/arm-linux-gnueabihf/sysroot/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/arm-linux-gnueabihf -I. -I. -isystem C:/sysgcc/raspberry/arm-linux-gnueabihf/sysroot/usr/include/arm-linux-gnueabihf/qt5 -isystem C:/sysgcc/raspberry/arm-linux-gnueabihf/sysroot/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -isystem C:/sysgcc/raspberry/arm-linux-gnueabihf/sysroot/usr/include/arm-linux-gnueabihf/qt5/QtGui -isystem C:/sysgcc/raspberry/arm-linux-gnueabihf/sysroot/usr/include/arm-linux-gnueabihf/qt5/QtCore -IDebug -o Debug/HRS_9250.o HRS_9250.cpp
-  HRS_9250.cpp: In member function 'int HRS_9250::Get9250Info(INFO_9250*)':
-C:\Users\skreikemeier\source\repos\ExEFIS2.0\ExEFIS\HRS_9250.cpp(273,38): warning : unused parameter 'info' [-Wunused-parameter]
-   int HRS_9250::Get9250Info(INFO_9250* info)
-                                        ^~~~
-  HRS_9250.cpp: In member function 'int HRS_9250::SetCalibration(HRS_CAL*)':
-C:\Users\skreikemeier\source\repos\ExEFIS2.0\ExEFIS\HRS_9250.cpp(279,39): warning : unused parameter 'cal' [-Wunused-parameter]
-   int HRS_9250::SetCalibration(HRS_CAL* cal)
-                                         ^~~
-  HRS_9250.cpp: In member function 'int HRS_9250::GetCalibration(HRS_CAL*)':
-C:\Users\skreikemeier\source\repos\ExEFIS2.0\ExEFIS\HRS_9250.cpp(285,39): warning : unused parameter 'cal' [-Wunused-parameter]
-   int HRS_9250::GetCalibration(HRS_CAL* cal)
-                                         ^~~
-  HRS_9250.cpp: In static member function 'static void HRS_9250::RunFilter()':
-C:\Users\skreikemeier\source\repos\ExEFIS2.0\ExEFIS\HRS_9250.cpp(449,10): warning : unused variable 'qw' [-Wunused-variable]
-      float qw, qx, qy, qz;
-            ^~
-C:\Users\skreikemeier\source\repos\ExEFIS2.0\ExEFIS\HRS_9250.cpp(449,14): warning : unused variable 'qx' [-Wunused-variable]
-      float qw, qx, qy, qz;
-                ^~
-C:\Users\skreikemeier\source\repos\ExEFIS2.0\ExEFIS\HRS_9250.cpp(449,18): warning : unused variable 'qy' [-Wunused-variable]
-      float qw, qx, qy, qz;
-                    ^~
-C:\Users\skreikemeier\source\repos\ExEFIS2.0\ExEFIS\HRS_9250.cpp(449,22): warning : unused variable 'qz' [-Wunused-variable]
-      float qw, qx, qy, qz;
-                        ^~
-C:\Users\skreikemeier\source\repos\ExEFIS2.0\ExEFIS\HRS_9250.cpp(368,15): warning : unused variable 'ab' [-Wunused-variable]
-    static float ab[3] = { -0.002, 0, 0 };
-                 ^~
-  HRS_9250.cpp: At global scope:
-C:\Users\skreikemeier\source\repos\ExEFIS2.0\ExEFIS\HRS_9250.cpp(368,15): warning : 'ab' defined but not used [-Wunused-variable]
+  C:/SysGCC/raspberry/bin/arm-linux-gnueabihf-g++.exe -c -pipe -Wno-psabi -std=gnu++14 -ggdb -g -Wall -W -D_REENTRANT -fPIC -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB -IC:/SysGCC/raspberry/arm-linux-gnueabihf/sysroot/usr/lib/arm-linux-gnueabihf/qt5/mkspecs/arm-linux-gnueabihf -I. -I. -isystem C:/sysgcc/raspberry/arm-linux-gnueabihf/sysroot/usr/include/arm-linux-gnueabihf/qt5 -isystem C:/sysgcc/raspberry/arm-linux-gnueabihf/sysroot/usr/include/arm-linux-gnueabihf/qt5/QtWidgets -isystem C:/sysgcc/raspberry/arm-linux-gnueabihf/sysroot/usr/include/arm-linux-gnueabihf/qt5/QtGui -isystem C:/sysgcc/raspberry/arm-linux-gnueabihf/sysroot/usr/include/arm-linux-gnueabihf/qt5/QtCore -IDebug -o Debug/horizon_instrument.o horizon_instrument.cpp
+  horizon_instrument.cpp: In constructor 'horizon_instrument::horizon_instrument(QWidget*)':
+C:\Users\skreikemeier\source\repos\ExEFIS2.0\ExEFIS\horizon_instrument.cpp(12,16): warning : unused variable 'l' [-Wunused-variable]
+    QMutexLocker *l = new QMutexLocker(_angleMutex);
+                  ^
+  horizon_instrument.cpp: In constructor 'horizon_instrument::horizon_instrument(QWidget*, QColor)':
+C:\Users\skreikemeier\source\repos\ExEFIS2.0\ExEFIS\horizon_instrument.cpp(21,16): warning : unused variable 'l' [-Wunused-variable]
+    QMutexLocker *l = new QMutexLocker(_angleMutex);
+                  ^
+C:\Users\skreikemeier\source\repos\ExEFIS2.0\ExEFIS\horizon_instrument.cpp(18,49): warning : unused parameter 'parent' [-Wunused-parameter]
+   horizon_instrument::horizon_instrument(QWidget *parent, QColor c)
+                                                   ^~~~~~
+  horizon_instrument.cpp: In member function 'virtual void horizon_instrument::paintEvent(QPaintEvent*)':
+C:\Users\skreikemeier\source\repos\ExEFIS2.0\ExEFIS\horizon_instrument.cpp(45,9): warning : variable 'center' set but not used [-Wunused-but-set-variable]
+    QPoint center = QPoint(width() / 2, height() / 2);
+           ^~~~~~
+C:\Users\skreikemeier\source\repos\ExEFIS2.0\ExEFIS\horizon_instrument.cpp(27,50): warning : unused parameter 'event' [-Wunused-parameter]
+   void horizon_instrument::paintEvent(QPaintEvent *event)
+                                                    ^~~~~
   C:/SysGCC/raspberry/bin/arm-linux-gnueabihf-g++.exe  -o Debug/ExEFIS Debug/adhrs.o Debug/airspeed.o Debug/altitude.o Debug/directional_gyro.o Debug/ExEFIS.o Debug/horizon_instrument.o Debug/HRS_9250.o Debug/hsc_pressure.o Debug/knobs.o Debug/DiagWidget.o Debug/MenuWidget.o Debug/MPU9250.o Debug/panelWidget.o Debug/reticle.o Debug/RotaryEncoder.o Debug/round_instrument.o Debug/SKFilter.o Debug/slipskid_instrument.o Debug/SplashWidget.o Debug/StatusWidget.o Debug/vertical_instrument.o Debug/WiringPiTransfer.o Debug/qrc_img.o Debug/moc_directional_gyro.o Debug/moc_horizon_instrument.o Debug/moc_panelWidget.o Debug/moc_reticle.o Debug/moc_round_instrument.o Debug/moc_SplashWidget.o Debug/moc_vertical_instrument.o Debug/moc_DiagWidget.o   -lwiringPi -lQt5Widgets -lQt5Gui -lQt5Core -lGLESv2 -lpthread 

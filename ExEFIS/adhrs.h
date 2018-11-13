@@ -17,7 +17,7 @@ public:
 	
 	
 private:
-	
+	float caldata[12];
 	hsc_pressure *staticpress;
 	hsc_pressure *airspeed;
 	float staticPressurePSI;
@@ -26,8 +26,8 @@ private:
 	float euRoll;	// page 35 in BNO055 manual, these are Euler Angles in order
 	float euPitch;	// page 35 in BNO055 manual, these are Euler Angles in order
 	float slipRAW;
-	void calfile_process_line(QByteArray &line, char* data);
-	bool calfile_validate(char* data);
+	void calfile_process_line(QByteArray &line, float* data);
+	bool calfile_validate(float* data);
 	HRS_9250 *hrs;
 	
 };

@@ -36,6 +36,7 @@ static const uint8_t SAMPLE_RATE_DIVISOR = 0x04;
 
 // scale resolutions per LSB for the sensors
 static float aRes, gRes, mRes;
+static int quatIndex = 0;
 
 static imu::Vector<3> euler;
 static float ax, ay, az, gx, gy, gz, mx, my, mz;
@@ -50,12 +51,12 @@ static float rollbuffer[buffersize];
 static float yawbuffer[buffersize];
 
 
-static int quatIndex = 0;
+
 
 //MPU9250Master *dev;
 MPU9250Passthru *dev;
 
-SKFilter filter;
+static SKFilter filter;
 
 // Pin definitions
 static const uint8_t intPin = 17;//0;  //GPIO 17;     //  MPU9250 interrupt
@@ -64,10 +65,10 @@ static const uint8_t intPin = 17;//0;  //GPIO 17;     //  MPU9250 interrupt
 static bool runFilter; 
 
 int sensorID;
-float* pGyroBias; 
-float* pAccelBias; 
-float* pMagBias; 
-float* pMagScale;
+static float* pGyroBias; 
+static float* pAccelBias; 
+static float* pMagBias; 
+static float* pMagScale;
 
 int GyroRaw[3] = { 
 	//1344,
@@ -100,30 +101,21 @@ HRS_9250::HRS_9250()
 	mpu = new WiringPiI2C(MPU9250::MPU9250_ADDRESS);
 	mag = new WiringPiI2C(MPU9250::AK8963_ADDRESS);
 	//dev = new MPU9250Master(mpu); 
-	dev = new MPU9250Passthru(mpu, mag);
-	
+	dev = new MPU9250Passthru(mpu, mag);	
 	
 	pGyroBias = gyroBias; 
 	pAccelBias = accelBias; 
 	pMagBias = magBias; 
 	pMagScale = magScale;
 	
+	filter = SKFilter();
+	
 	printf("Created MPU9250 9-axis motion sensor...\n");	
 }
 
-HRS_9250::HRS_9250(float* ppGyroBias, float* ppAccelBias, float* ppMagBias, float* ppMagScale):HRS_9250()
-{
-	ax = ay = az = gx = gy = gz = mx = my = mz = 0;
-	
-	runFilter = false;
-	wiringPiSetup();
-	
-	mpu = new WiringPiI2C(MPU9250::MPU9250_ADDRESS);
-	mag = new WiringPiI2C(MPU9250::AK8963_ADDRESS);
-	//dev = new MPU9250Master(mpu); 
-	dev = new MPU9250Passthru(mpu, mag);
-		
-	
+HRS_9250::HRS_9250(float* ppGyroBias, float* ppAccelBias, float* ppMagBias, float* ppMagScale)
+	: HRS_9250()
+{	
 	pGyroBias = ppGyroBias; 
 	pAccelBias = ppAccelBias; 
 	pMagBias = ppMagBias; 
@@ -172,7 +164,7 @@ int HRS_9250::Init(bool doSelfTest, bool doCalibration, bool doMagCalibration)
 		gRes = dev->getGres(GSCALE);
 		mRes = dev->getMres(MSCALE);
 		
-		dev->SendCalibrationData(GyroRaw, AccelRaw);
+		//dev->SendCalibrationData(GyroRaw, AccelRaw);
 		
 		if (doCalibration)
 		{		
@@ -331,13 +323,7 @@ float HRS_9250::getPitch(void)
 
 float HRS_9250::getHeading(void)
 {
-	float ret = 0.0f;
-	for (int i = 0; i < buffersize; i++)
-	{
-		ret  += yawbuffer[i];
-	}
-	ret /= buffersize;
-	return ret;
+	return filter.getHeading_rad();
 }
 
 imu::Vector<3> HRS_9250::GetAccelerometer(int*status)
@@ -347,7 +333,8 @@ imu::Vector<3> HRS_9250::GetAccelerometer(int*status)
 }
 
 
-bool inInt = false;
+static bool inInt = false;
+
 void HRS_9250::imuInterruptHander(void)
 {
 	if (!inInt)
@@ -376,14 +363,14 @@ void HRS_9250::RunFilter(void)
 		   dev->readMPU9250Data(MPU9250Data);      // INT cleared on any read
 
 		   // Convert the accleration value into g's
-		   ax = (float)MPU9250Data[0]*aRes;// - ab[0]; //pAccelBias[0];  
-			ay = (float)MPU9250Data[1]*aRes;/// - ab[1]; //pAccelBias[1];   
-			az = (float)MPU9250Data[2]*aRes;// - ab[2]; //pAccelBias[2];  
+		   ax = (float)MPU9250Data[0]*aRes - pAccelBias[0];  
+			ay = (float)MPU9250Data[1]*aRes - pAccelBias[1];   
+			az = (float)MPU9250Data[2]*aRes- pAccelBias[2];  
 
 			// Convert the gyro value into degrees per second
-			gx = (float)MPU9250Data[4]*gRes;  
-			gy = (float)MPU9250Data[5]*gRes;  
-			gz = (float)MPU9250Data[6]*gRes; 
+			gx = (float)MPU9250Data[4]*gRes - pGyroBias[0];  
+			gy = (float)MPU9250Data[5]*gRes - pGyroBias[1];  
+			gz = (float)MPU9250Data[6]*gRes - pGyroBias[2]; 
 
 			
 
@@ -392,19 +379,18 @@ void HRS_9250::RunFilter(void)
 		
 		if (dev->checkNewMagData())
 		{
-			dev->readMagData(magCount);        // Read the x/y/z adc values
+			dev->readMagData(magCount);         // Read the x/y/z adc values
 
 			// Calculate the magnetometer values in milliGauss
 			// Include factory calibration per data sheet and user environmental corrections
 			// Get actual magnetometer value, this depends on scale being set
-			mx = (float)magCount[0]*mRes*magCalibration[0];// - pMagBias[0];  
-			my = (float)magCount[1]*mRes*magCalibration[1];// - pMagBias[1];  
-			mz = (float)magCount[2]*mRes*magCalibration[2];// - pMagBias[2];  
-			//mx *= pMagScale[0];
-			//my *= pMagScale[1];
-			//mz *= pMagScale[2]; 
+			mx = (float)magCount[0]*mRes*magCalibration[0] - pMagBias[0];  
+			my = (float)magCount[1]*mRes*magCalibration[1] - pMagBias[1];  
+			mz = (float)magCount[2]*mRes*magCalibration[2] - pMagBias[2];  
+			mx *= pMagScale[0];
+			my *= pMagScale[1];
+			mz *= pMagScale[2];		
 		}
-
 		// Report at 1Hz
 		static uint32_t msec_prev;
 		static int last;
@@ -417,12 +403,16 @@ void HRS_9250::RunFilter(void)
 		//The Y Vector points to the wings
 		//The Z Vector points to the front of the airplane
 		
-		filter.update(gz*M_PI / 180.0f, gy*M_PI / 180.0f, gx*M_PI / 180.0f, az, ay, ax, mz, my, mx);
-		//filter.getQuaternion(&quatW[quatIndex], &quatX[quatIndex], &quatY[quatIndex], &quatZ[quatIndex]);		
+		if(filter.validate(gz*M_PI / 180.0f, -gy*M_PI / 180.0f, -gx*M_PI / 180.0f, az, ay, ax, mz, my, mx))
+		{
+		
+			filter.update(gz*M_PI / 180.0f, -gy*M_PI / 180.0f, -gx*M_PI / 180.0f, az, ay, ax, mz, my, mx);
+			//filter.getQuaternion(&quatW[quatIndex], &quatX[quatIndex], &quatY[quatIndex], &quatZ[quatIndex]);		
+		}
 		
 		rollbuffer[quatIndex] = filter.getRoll_rad();		
 		pitchbuffer[quatIndex] = filter.getPitch_rad(); 					
-		yawbuffer[quatIndex] = filter.getHeading_rad();
+		//yawbuffer[quatIndex] = filter.getHeading_rad();
 	
 		quatIndex++;
 		if (quatIndex > buffersize) quatIndex = 0;
@@ -457,9 +447,9 @@ void HRS_9250::RunFilter(void)
 			//printf("gx = %+2.2f  gy = %+2.2f  gz = %+2.2f deg/s\n", gx, gy, gz);
 			//printf("mx = %d  my = %d  mz = %d mG\n", (int)mx, (int)my, (int)mz);
 			//printf("%d, %d, %d \n", (int)mx, (int)my, (int)mz);
-			printf("ORIENTATION:::  hdg = %f  pit = %f  roll = %f \n", euler.x() * 180.0f / M_PI, euler.y() * 180.0f / M_PI, euler.z() * 180.0f / M_PI);
-			printf("%f, %f, %f \n", euler.x() * 180.0f / M_PI, euler.y() * 180.0f / M_PI, euler.z() * 180.0f / M_PI);
-			printf("Orientation:, %f, %f, %f, Accelerometer:, %d, %d, %d, Gyro: , %+2.2f, %+2.2f, %+2.2f, Mag:, %+3.3f, %+3.3f, %+3.3f,  \n", 
+		//	printf("ORIENTATION:::  hdg = %f  pit = %f  roll = %f \n", euler.x() * 180.0f / M_PI, euler.y() * 180.0f / M_PI, euler.z() * 180.0f / M_PI);
+		//	printf("%f, %f, %f \n", euler.x() * 180.0f / M_PI, euler.y() * 180.0f / M_PI, euler.z() * 180.0f / M_PI);
+			printf("Orientation:, %f, %f, %f, Accelerometer:, %d, %d, %d, Gyro: , %+2.2f, %+2.2f, %+2.2f, Mag:, %+3.3f, %+3.3f, %+3.3f, Quad: %d \n", 
 				euler.x() * 180.0f / M_PI,
 				euler.y() * 180.0f / M_PI,
 				euler.z() * 180.0f / M_PI, 
@@ -471,7 +461,8 @@ void HRS_9250::RunFilter(void)
 				gz,
 				mx,
 				my,
-				mz);
+				mz,
+				filter.quad);
 //			printf("Orientation:, %f, %f, %f, Accelerometer:, %d, %d, %d, Gyro: , %d, %d, %d, Mag:, %d, %d, %d,  \n", 
 //				euler.x() * 180.0f / M_PI,
 //				euler.y() * 180.0f / M_PI,

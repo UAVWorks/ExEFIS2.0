@@ -96,23 +96,26 @@ static constexpr int press[43] =
 float airspeedavg[10] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 int index = 0;
 
+// 9/29/18 flight observations
+/*
+ *Kitfox    ExEFIS
+ *91        80
+ *69.5      63
+ *99        87
+ *
+ **/
+const float unitConversion = 237.334;
+const float calibration = 1.117;
+// 2  x  1 lbf     1 ft^3       12^2 in^2  1 slug ft    3600 sec    1 mile
+// --------x--------------x-----------x----------x-----------x----------
+// 1     in^2   0.0023769 slug   1 ft^2    1 lbf s^2      1 hr      5280 ft
 float airspeed::getAirspeedMph(float pressurePsi, float tempC, float staticPressPSI)
-{
-	//calc rho for density of air
-	//R = 8.3144598×10−6 m3 MPa K−1 mol−1
-	//float staticPressMPa = staticPressPSI * 0.00689476; //N / m2
-	//float rho = staticPressMPa / ((tempC + 273.15f) * 0.00000083144598f); //RHO IS IN kg / M3
-	float rho = 0.0023769f; //slugs / ft3 // 1.225;  //kg / m3	
+{	
 	float velocity = 0.0f;
-	float press = pressurePsi - 0.01f;
+	float press = pressurePsi;// - 0.001f;
 	if (pressurePsi >= 0.0f)
-	{
-		//float unitConversion = 100.0f * 68.9476f * 2.23694f / 9.8f;    //(Pa/mbar *kg*m*mph * mbar/psi) / (mBar * Pa * s2 * m2 *m/2)
-		//velocity = sqrt((2*pressurePsi) / rho) * .681818f;
-		velocity = sqrt(press) * 240.0f;
-	
-		//float velocity = 12.4625f*sqrt((mbar * 0.401865f) / 0.075f);
-		//float velocity = 24.877f * (pow(pressuremBar, 0.4975f));
+	{		
+		velocity = sqrt(press) * unitConversion * calibration;
 	}
 	
 	
@@ -125,26 +128,6 @@ float airspeed::getAirspeedMph(float pressurePsi, float tempC, float staticPress
 	{
 		sum += airspeedavg[i];
 	}
-	/*
-	int inh20 = pressuremBar * 0.401865;
-	int i = 0;
-	bool found = false;
-	while (i < 22 && found == false)
-	{
-		if (press[i] > inh20)
-		{
-			i -= 2;
-			found = true; 
-		}
-		i++;
-	}
-	
-	if (i < 0) i = 0;
-	
-	float percent = (inh20 - press[i]) / (press[i + 1] - press[i]);
-	asp = percent * (speed[i + 1] - speed[i]) + speed[i];
-	asp *= 0.53997;
-	*/
 	
 	return sum/10.0f;
 }
